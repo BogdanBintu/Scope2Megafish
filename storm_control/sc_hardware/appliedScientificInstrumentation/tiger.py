@@ -61,8 +61,11 @@ class Tiger(RS232.RS232):
             self.commWithResp("MC X- Y- Z-")
 
     def position(self):
-        [self.x, self.y] = map(lambda x: float(x)*self.unit_to_um, 
-                               self.commWithResp("W X Y").split(" ")[1:3])
+        try:
+            [self.x, self.y] = map(lambda x: float(x)*self.unit_to_um, 
+                                   self.commWithResp("W X Y").split(" ")[1:3])
+        except:
+            [self.x, self.y] = (0,0)
         return {"x" : self.x,
                 "y" : self.y}
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
 HAL module for Lumencor laser control.
+
 Hazen 04/17 Bogdan 03/19
 """
 
@@ -42,6 +43,7 @@ class LumencorModule(amplitudeModule.AmplitudeModule):
         self.film_mode = False
         self.laser = None
         self.laser_functionality = None
+
         configuration = module_params.get("configuration")
         self.used_during_filming = configuration.get("used_during_filming")
 
@@ -60,16 +62,13 @@ class LumencorModule(amplitudeModule.AmplitudeModule):
         self.device_mutex.unlock()
                 
     def startFilm(self, message):
-        
         if message.getData()["film settings"].runShutters():
-            #print("cond1")
             if self.used_during_filming and (self.laser_functionality is not None):
-                #print("cond2")
                 hardwareModule.runHardwareTask(self,
                                                message,
                                                lambda : self.setExtControl(True))
                 self.film_mode = True
-                #print("cond3")
+
     def stopFilm(self, message):
         if self.film_mode:
             hardwareModule.runHardwareTask(self,
@@ -99,4 +98,4 @@ class Celesta(LumencorModule):
                                                                   maximum = int(100.0 * pmax),
                                                                   used_during_filming = self.used_during_filming)
         else:
-            self.laser = None 
+            self.laser = None            

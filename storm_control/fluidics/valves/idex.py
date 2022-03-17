@@ -34,13 +34,21 @@ class TitanValve(AbstractValve):
 
     def updateValveStatus(self):
         self.write('P?')
-        #print("garbage")
+        
         response = self.read()
+        #print("started")
+        #print(response)
+        #print(response.strip(string.ascii_letters))
+        
         if '!' in response:
             self.moving = True
+            
         else:
             self.moving = False 
-            self.current_position = int(response.strip(string.ascii_letters))
+            try:
+                self.current_position = int(response.strip(string.ascii_letters))#####failed
+            except:
+                self.current_position = -1
             #print(self.current_position)
         return self.current_position, self.moving
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
 Image file writers for various formats.
-
 Hazen 03/17
+Modifications by Bogdan based on Aditya 1/20/2022 to include zaar and software binning
 """
 
 import copy
@@ -10,7 +10,10 @@ import datetime
 import struct
 import tifffile
 import time
-
+import zarr
+import numpy as np
+import dask.array as da
+import os
 from PyQt5 import QtCore
 
 import storm_control.sc_library.halExceptions as halExceptions
@@ -32,9 +35,9 @@ def availableFileFormats(test_mode):
     #
 
     if test_mode:
-        return [".dax", ".tif", ".big.tif", ".test"]
+        return [".dax", ".tif", ".big.tif", ".zarr", ".test"]
     else:
-        return [".dax", ".tif", ".big.tif"]
+        return [".dax", ".tif", ".big.tif", ".zarr"]
 
 def createFileWriter(camera_functionality, film_settings):
     """
@@ -58,6 +61,11 @@ def createFileWriter(camera_functionality, film_settings):
     elif (ft == ".tif"):
         return TIFFile(camera_functionality = camera_functionality,
                        film_settings = film_settings)
+                       
+    elif (ft == ".zarr"):
+        return ZarrFile(camera_functionality = camera_functionality,
+                       film_settings = film_settings)
+                       
     else:
         raise ImageWriterException("Unknown output file format '" + ft + "'")
 
@@ -83,7 +91,15 @@ class BaseFileWriter(object):
         # Connect the camera functionality.
         self.cam_fn.newFrame.connect(self.saveFrame)
         self.cam_fn.stopped.connect(self.handleStopped)
-
+        try:
+            self.binx = int(self.cam_fn.getParameter("x_bin_cam"))
+            self.biny = int(self.cam_fn.getParameter("y_bin_cam"))
+        except:
+            self.binx,self.biny=1,1
+        self.wT = int(self.cam_fn.getParameter("x_pixels"))
+        self.hT = int(self.cam_fn.getParameter("y_pixels"))
+        self.w,self.h = self.wT//self.binx,self.hT//self.biny
+        
     def closeWriter(self):
         assert self.stopped
         self.cam_fn.newFrame.disconnect(self.saveFrame)
@@ -102,6 +118,55 @@ class BaseFileWriter(object):
         self.number_frames += 1
 
 
+class ZarrFile(BaseFileWriter):
+    """
+    Zarr file writing class.
+    """
+    def __init__(self, **kwds):
+        super().__init__(**kwds)
+        
+        dirname = os.path.dirname(self.filename)
+        group = dirname+os.sep+os.path.basename(self.filename).split("_")[-1].split(".")[0]
+        root = zarr.open(self.filename, mode='w')
+        group = root.create_group(group)
+        
+        
+        
+        self.z1 = group.empty('data', shape=(1,self.h,self.w), chunks=(1,self.h,self.w), dtype='uint16')
+        
+    def closeWriter(self):
+        """
+        Close the file and write a very simple .inf file. All the metadata is
+        now stored in the .xml file that is saved with each recording.
+        """
+        super().closeWriter()
+        
+        w = str(self.w)
+        h = str(self.h)
+        with open(self.basename + ".inf", "w") as inf_fp:
+            inf_fp.write("binning = 1 x 1\n")
+            inf_fp.write("data type = 16 bit integers (binary, little endian)\n")
+            inf_fp.write("frame dimensions = " + w + " x " + h + "\n")
+            inf_fp.write("number of frames = " + str(self.number_frames) + "\n")
+            if True:
+                inf_fp.write("x_start = 1\n")
+                inf_fp.write("x_end = " + w + "\n")
+                inf_fp.write("y_start = 1\n")
+                inf_fp.write("y_end = " + h + "\n")
+            inf_fp.close()
+
+    def saveFrame(self, frame):
+        
+        super().saveFrame()
+        image = frame.getData()
+        w,h,binx,biny = self.w,self.h,self.binx,self.biny
+        if binx!=1 or biny!=1:
+            daimage = da.from_array(np_data,chunks = len(np_data) // 4)
+            image = daimage.reshape((1,h,binx,w,biny)).sum(axis=(-1,-3),dtype=np.uint16).compute()
+        else:
+            image = np.array(image).reshape((1,h,w))
+        self.z1.append(image)
+        
 class DaxFile(BaseFileWriter):
     """
     Dax file writing class.
@@ -134,14 +199,18 @@ class DaxFile(BaseFileWriter):
 
     def saveFrame(self, frame):
         super().saveFrame()
-        np_data = frame.getData()
+        w,h,binx,biny = self.w,self.h,self.binx,self.biny
+        
+        np_data= frame.getData()
+        if binx!=1 or biny!=1:
+            daimage = da.from_array(np_data,chunks = len(np_data) // 4)
+            np_data = daimage.reshape((h,binx,w,biny)).sum(axis=(-1,1),dtype=np.uint16).compute()
         np_data.tofile(self.fp)
 
 
 class SPEFile(BaseFileWriter):
     """
     SPE file writing class.
-
     FIXME: This has not been tested, could be broken..
     """
     def __init__(self, **kwds):
@@ -227,11 +296,10 @@ class TIFFile(BaseFileWriter):
     def saveFrame(self, frame):
         super().saveFrame()
         image = frame.getData()
-        print(self.metadata)
-        print(self.resolution)
         self.tif.save(image.reshape((frame.image_y, frame.image_x)),
                       metadata = self.metadata,
-                      resolution = self.resolution, contiguous=True)
+                      resolution = self.resolution, 
+                      contiguous = True)
 
 
 #

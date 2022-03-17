@@ -1,2 +1,1 @@
-rem Activate virtual environment and start Steve.
-c:\users\hazen\pyenv\hal2\scripts\activate && python steve.py
+cmd /k "C:\Users\Scope1\anaconda3\Scripts\activate myenv && python steve.py"

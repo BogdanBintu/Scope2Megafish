@@ -13,7 +13,7 @@ import storm_control.sc_library.parameters as params
 
 import storm_control.hal4000.camera.cameraControl as cameraControl
 import storm_control.hal4000.camera.cameraFunctionality as cameraFunctionality
-
+import time
 
 class flirCameraControl(cameraControl.HWCameraControl):
     """
@@ -42,14 +42,22 @@ class flirCameraControl(cameraControl.HWCameraControl):
         #self.camera.setProperty("PixelFormat", "Mono12Packed")
         #self.camera.setProperty("PixelFormat", "Mono12p")
         if self.camera.hasProperty("PixelFormat"):
-            self.camera.setProperty("PixelFormat", "Mono12Packed")
-
+            self.camera.setProperty("PixelFormat", "Mono16")
+        if self.camera.hasProperty("ADCBitDepth"):
+            self.camera.setProperty("ADCBitDepth", "12Bit")
+        if self.camera.hasProperty("Width"):
+            self.camera.setProperty("Width", 6000)
+        if self.camera.hasProperty("OffsetX"):
+            self.camera.setProperty("OffsetX", 232)
+        
+        
+        
         # We don't want any of these 'features'.
         #self.camera.setProperty("AcquisitionFrameRateAuto", "On")
         # Hard set these parameters
         #self.camera.setProperty("ExposureAuto", "On")
         self.camera.setProperty("ExposureMode","Timed")
-        self.camera.setProperty("ExposureAuto","Off")
+        #self.camera.setProperty("ExposureAuto","Continuous")#"Off"
         self.camera.setProperty("AcquisitionFrameRateEnable", True)
         self.camera.setProperty("GainAuto", "Off")        
 
@@ -83,8 +91,8 @@ class flirCameraControl(cameraControl.HWCameraControl):
             self.camera.setProperty("TriggerMode", "Off")
 
             # This line is connected to the DAQ.
-            #self.camera.setProperty("LineSelector", "Line1")
-            #self.camera.setProperty("LineSource", "ExposureActive")
+            self.camera.setProperty("LineSelector", "Line2")
+            self.camera.setProperty("LineSource", "ExposureActive")
 
             # This line is connected to the other cameras.
             #self.camera.setProperty("LineSelector", "Line2")
@@ -153,16 +161,18 @@ class flirCameraControl(cameraControl.HWCameraControl):
         for pname in self.pgrey_props:
             self.camera.getProperty(pname)
 
-        max_intensity = 2**12 # because 12 bit
+        max_intensity = 2**16 # No! reset to 16bit #because 12 bit
         self.parameters.setv("max_intensity", max_intensity)
 
         # Set chip size and HAL parameter ranges.
-        x_chip = self.camera.getProperty("WidthMax").getValue()
+        #x_chip = self.camera.getProperty("WidthMax").getValue()
+        x_chip = self.camera.getProperty("Width").getValue()
         self.parameters.setv("x_chip", x_chip)
         for pname in ["x_end", "x_start"]:
             self.parameters.getp(pname).setMaximum(x_chip)
 
-        y_chip = self.camera.getProperty("HeightMax").getValue()
+        #y_chip = self.camera.getProperty("HeightMax").getValue()
+        y_chip = self.camera.getProperty("Height").getValue()
         self.parameters.setv("y_chip", y_chip)
         for pname in ["y_end", "y_start"]:
             self.parameters.getp(pname).setMaximum(y_chip)        
@@ -291,7 +301,7 @@ class flirCameraControl(cameraControl.HWCameraControl):
             
             # For master cameras, set the exposure time to be the maximum given the current frame rate.
             #if self.is_master:
-            self.camera.setProperty("ExposureTime", 1.0e6 * 1./self.camera.getProperty("AcquisitionFrameRate").getValue())
+            #self.camera.setProperty("ExposureTime", 1.0e6 * 1./self.camera.getProperty("AcquisitionFrameRate").getValue())
             self.parameters.setv("exposure_time", 1.0e-6 * self.camera.getProperty("ExposureTime").getValue())
             # HAL uses seconds, FLIRE uses microseconds.
             #print("UPDATING EXPOSURE TIME")
@@ -330,15 +340,17 @@ class flirCameraControl(cameraControl.HWCameraControl):
         # re-configure the output source to one that is constant
         # when the camera stops.
         #
-        #if self.is_master:
-            #self.camera.setProperty("LineSelector", "Line1")
-            #self.camera.setProperty("LineSource", "ExposureActive")
+        if self.is_master:
+            
+            #time.sleep(0.05)
+            self.camera.setProperty("LineSelector", "Line2")
+            self.camera.setProperty("LineSource", "ExposureActive")
 
     def stopCamera(self):
         super().stopCamera()
-        #if self.is_master:
-            #self.camera.setProperty("LineSelector", "Line1")
-            #self.camera.setProperty("LineSource", "ExternalTriggerActive")
+        if self.is_master:
+            self.camera.setProperty("LineSelector", "Line2")
+            self.camera.setProperty("LineSource", "Off")
         
 #
 # The MIT License

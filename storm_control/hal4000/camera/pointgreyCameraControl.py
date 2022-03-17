@@ -37,17 +37,18 @@ class PointGreyCameraControl(cameraControl.HWCameraControl):
 
         # In order to turn off pixel defect correction the camera has
         # to be in video mode 0.
-        #self.camera.setProperty("VideoMode", "Mode0")
-       # self.camera.setProperty("pgrDefectPixelCorrectionEnable", False)
+        self.camera.setProperty("VideoMode", "Mode0")
+        self.camera.setProperty("pgrDefectPixelCorrectionEnable", False)
         
         # Set pixel format.
         #self.camera.setProperty("PixelFormat", "Mono12Packed")
         #self.camera.setProperty("PixelFormat", "Mono12p")
         self.camera.setProperty("PixelFormat", "Mono16")
 
-        #self.camera.setProperty("VideoMode", config.get("video_mode"))
+        self.camera.setProperty("VideoMode", config.get("video_mode"))
+                
         # We don't want any of these 'features'.
-        #self.camera.setProperty("AcquisitionFrameRateAuto", "Off")
+        self.camera.setProperty("AcquisitionFrameRateAuto", "Off")
         self.camera.setProperty("ExposureAuto", "Off")
         self.camera.setProperty("GainAuto", "Off")        
 
@@ -68,7 +69,7 @@ class PointGreyCameraControl(cameraControl.HWCameraControl):
         # camera. We try and turn it off but that seems to be much
         # harder to do than one would hope.
         #
-        #self.camera.setProperty("OnBoardColorProcessEnabled", False)
+        self.camera.setProperty("OnBoardColorProcessEnabled", False)
 
         # Verify that we have turned off some of these 'features'.
         for feature in ["pgrDefectPixelCorrectionEnable",
@@ -105,7 +106,6 @@ class PointGreyCameraControl(cameraControl.HWCameraControl):
             self.camera.setProperty("TriggerMode", "On")
             self.camera.setProperty("TriggerSource", "Line3")
             self.camera.setProperty("TriggerOverlap", "ReadOut")
-            self.camera.setProperty("TriggerActivation", config.get("trigger_activation", "FallingEdge"))
 
         #
         # Dictionary of Point Grey specific camera parameters.
@@ -290,16 +290,11 @@ class PointGreyCameraControl(cameraControl.HWCameraControl):
                 param.setMinimum(self.camera.getProperty(pname).getMinimum())
                 param.setv(parameters.get(pname))
 
-            # For master cameras, set the exposure time to be the maximum given the current frame rate.
+            # Set the exposure time to be the maximum given the current frame rate.
             if self.is_master:
                 self.camera.setProperty("ExposureTime", self.camera.getProperty("ExposureTime").getMaximum())
                 self.parameters.setv("exposure_time", 1.0e-6 * self.camera.getProperty("ExposureTime").getValue())
                 self.parameters.setv("fps", self.camera.getProperty("AcquisitionFrameRate").getValue())
-
-            # For slave cameras, just copy 'ExposureTime' to 'exposure_time' for
-            # the benefit of the camera parameters viewer.
-            else:
-                self.parameters.setv("exposure_time", 1.0e-6 * self.camera.getProperty("ExposureTime").getValue())
 
             # Update camera frame size.
             self.parameters.setv("bytes_per_frame",

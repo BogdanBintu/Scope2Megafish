@@ -91,29 +91,29 @@
 <!-- speed 200 ~= 1 mL / 10 sec -->
   <pump_commands>
      <pump_cmd name = "Flow 0.5mL">
-       <pump_config position = "500" speed = "200"></pump_config>
+       <pump_config position = "500" speed = "30"></pump_config>
      </pump_cmd>
      <pump_cmd name = "Flow 1mL">
-       <pump_config position = "1000" speed = "200"></pump_config>
+       <pump_config position = "1000" speed = "30"></pump_config>
      </pump_cmd>
      <pump_cmd name = "Flow 2mL">
-       <pump_config position = "2000" speed = "200"></pump_config>
+       <pump_config position = "2000" speed = "30"></pump_config>
      </pump_cmd>
      <pump_cmd name = "Flow 4mL">
-       <pump_config position = "4000" speed = "200"></pump_config>
+       <pump_config position = "4000" speed = "30"></pump_config>
      </pump_cmd>
      <pump_cmd name = "Flow 5mL">
-       <pump_config position = "5000" speed = "200"></pump_config>
+       <pump_config position = "5000" speed = "30"></pump_config>
      </pump_cmd>
      <pump_cmd name = "Flow 6mL">
-       <pump_config position = "6000" speed = "200"></pump_config>
+       <pump_config position = "6000" speed = "30"></pump_config>
      </pump_cmd>
   </pump_commands>
 
   <kilroy_protocols>
      <protocol name = "Extra Wash">
 	<valve duration = "0">Flow Wash</valve>
-        <pump duration = "200">Normal Flow</pump>
+        <pump duration = "30">Normal Flow</pump>
 	<pump duration = "0">Stop Flow</pump>
      </protocol>
      <protocol name = "Hybridize 1">

@@ -342,6 +342,7 @@ class CameraFrameViewer(QtWidgets.QFrame):
         This sends a message to the new camera / feed that it will respond 
         to with information about how it should be displayed.
         """
+
         #
         # Disconnect current camera functionality. Anything that results
         # in a change in the camera functionality should pass through
@@ -350,17 +351,7 @@ class CameraFrameViewer(QtWidgets.QFrame):
         # mess..
         #
         if self.cam_fn is not None:
-            #
-            # After the parameter change it is possible that the display
-            # was connected to a feed that no longer exists. In this case
-            # self.cam_fn will already be disconnected and the combo
-            # box will show a blank. We catch the attempt to double
-            # disconnect with the try / except TypeError.
-            #
-            try:
-                self.cam_fn.newFrame.disconnect(self.handleNewFrame)
-            except TypeError:
-                pass
+            self.cam_fn.newFrame.disconnect(self.handleNewFrame)
             
         self.parameters.setv("feed_name", str(feed_name))
         self.feedChange.emit(feed_name)
@@ -564,7 +555,6 @@ class CameraFrameViewer(QtWidgets.QFrame):
         This updates feed selector combo box with a list of 
         the feeds that are currently available.
         """
-        
         # Disconnect signal.
         self.ui.feedComboBox.currentIndexChanged[str].disconnect()
 

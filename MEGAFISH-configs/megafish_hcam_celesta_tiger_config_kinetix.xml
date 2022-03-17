@@ -5,7 +5,7 @@
         <directory type="directory">D:/Data/</directory>
 
         <!-- The setup name -->
-        <setup_name type="string">MEGAFISH</setup_name>
+        <setup_name type="string">SCOPE1</setup_name>
 
         <!-- The ui type, this is 'classic' or 'detached' -->
         <ui_type type="string">classic</ui_type>
@@ -45,6 +45,7 @@
             <parameters>
                 <!-- The default color table. Other options are in hal4000/colorTables/all_tables -->
                 <colortable type="string">ramp.ctbl</colortable>
+				<max_intensity type="int">65536</max_intensity>
             </parameters>
         </display>
 
@@ -281,7 +282,7 @@
 
       <configuration>
 	<baudrate type="int">115200</baudrate>
-	<port type="string">COM4</port>
+	<port type="string">COM3</port>
 	<ttl_mode type="int">22</ttl_mode>	
 	<devices>
 	  <xy_stage>
@@ -334,6 +335,7 @@
         </scmos_cal>
 
 
+
         <!-- TCP control -->
         <tcp_control>
             <module_name type="string">storm_control.hal4000.tcpControl.tcpControl</module_name>
@@ -361,7 +363,7 @@
             <class_name type="string">Celesta</class_name>
             <configuration>
                 <ip type="string">192.168.201.200</ip>
-                <laser_id type="int">2</laser_id>
+                <laser_id type="int">1</laser_id>
                 <used_during_filming type="boolean">True</used_during_filming>
             </configuration>
         </Lumencor473>
@@ -372,7 +374,7 @@
             <class_name type="string">Celesta</class_name>
             <configuration>
                 <ip type="string">192.168.201.200</ip>
-                <laser_id type="int">4</laser_id>
+                <laser_id type="int">2</laser_id>
                 <used_during_filming type="boolean">True</used_during_filming>
             </configuration>
         </Lumencor545>
@@ -383,7 +385,7 @@
             <class_name type="string">Celesta</class_name>
             <configuration>
                 <ip type="string">192.168.201.200</ip>
-                <laser_id type="int">5</laser_id>
+                <laser_id type="int">3</laser_id>
                 <used_during_filming type="boolean">True</used_during_filming>
             </configuration>
         </Lumencor635>
@@ -394,7 +396,7 @@
             <class_name type="string">Celesta</class_name>
             <configuration>
                 <ip type="string">192.168.201.200</ip>
-                <laser_id type="int">6</laser_id>
+                <laser_id type="int">4</laser_id>
                 <used_during_filming type="boolean">True</used_during_filming>
             </configuration>
         </Lumencor750> 
@@ -417,15 +419,15 @@
                 <background type="int">1000</background>
                 <camera_id type="int">1</camera_id>
                 <ini_file type="string">uc480_settings.ini</ini_file>
-                <offset_file type="string">C:\MEGAFISH\MEGAFISH-configs\cam_offsets_megafish.txt</offset_file>
-                <sigma type="float">3</sigma>
+                <offset_file type="string">C:\storm_control_megafish\MEGAFISH-configs\cam_offsets_megafish.txt</offset_file>
+                <sigma type="float">8</sigma>
                 <uc480_dll type="string">C:\Windows\System32\uc480_64.dll</uc480_dll>
-                <x_width type="int">250</x_width>
-                <y_width type="int">60</y_width>
+                <x_width type="int">492</x_width>
+                <y_width type="int">100</y_width>
                 <use_storm_analysis type="boolean">True</use_storm_analysis>
-                <units_to_microns type="float">0.05</units_to_microns> 
+                <units_to_microns type="float">0.125</units_to_microns> 
                 <pixel_clock type="int">5</pixel_clock>
-                <!-- Units_to microns: negative is because in the current setup the spots 
+                <!-- Units_to microns: 0.25-25X,0.05 negative is because in the current setup the spots 
                     get closer as the objective approaches the coverslip. It should be positive 
                     if the spots get apart as the objective approaches the coverslip-->
             </configuration>
@@ -449,7 +451,7 @@
                         <offset_threshold type="float">100</offset_threshold>
                     </locked>
                     <scan> <!-- from MF6 -->
-                        <minimum_sum type="float">50000</minimum_sum>
+                        <minimum_sum type="float">70000</minimum_sum>
                         <scan_step type="float">0.1</scan_step>
                         <offset_threshold type="float">100</offset_threshold>
                     </scan>

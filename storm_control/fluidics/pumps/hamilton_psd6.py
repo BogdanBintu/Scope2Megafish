@@ -103,12 +103,12 @@ class APump():
         elif valvePosition == 'Output':
             self.sendString('/1OR\r')
 
-    def setSyringePosition(self, position, valvePosition=None, speed=500,
+    def setSyringePosition(self, position, valvePosition=None, speed=100,
                            emptyFirst=False):
         commandString = '/1'
 
         if emptyFirst:
-            commandString += 'OV5000A0'
+            commandString += 'OV100A0'
 
         if valvePosition is not None:
             if valvePosition == 'Input':
@@ -122,7 +122,7 @@ class APump():
         self.sendString(commandString + 'R\r')
 
     def emptySyringe(self):
-        self.sendString('/1OV5000A0R\r')
+        self.sendString('/1OV100A0R\r')
 
     def stopSyringe(self):
         self.sendString('/1TR\r')

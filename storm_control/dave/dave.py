@@ -409,7 +409,15 @@ class Dave(QtWidgets.QMainWindow):
             self.ui.commandSequenceTreeView.updateEstimates()
 
         # Increment command to the next valid command / action.
-        next_command = self.ui.commandSequenceTreeView.getNextItem()
+        #BB: modify here
+        #
+        errorDAQ = eval([ln for ln in open(r'D:\Data\errorDAQ.txt','r')][0])
+        if errorDAQ:
+            next_command = self.ui.commandSequenceTreeView.getCurrentItem()
+            currentDT = datetime.datetime.now()
+            print(str(currentDT))
+        else:
+            next_command = self.ui.commandSequenceTreeView.getNextItem()
 
         # Handle last command in list.
         if next_command is None:
@@ -447,7 +455,8 @@ class Dave(QtWidgets.QMainWindow):
                 self.handlePause()
 
         # Update progress bar and current command display.
-        self.updateRunStatusDisplay()
+        if not errorDAQ:
+            self.updateRunStatusDisplay()
 
     ## handleDropXML
     #

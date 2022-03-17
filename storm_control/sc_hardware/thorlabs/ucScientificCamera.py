@@ -109,7 +109,9 @@ class Camera(Handle):
 
         self.im_width = self.info.nMaxWidth
         self.im_height = self.info.nMaxHeight
-
+        self.transpose = False
+        if self.transpose:
+            self.im_width,self.im_height=self.im_height,self.im_width
         # Initialize some general camera settings.
         self.camera.exposure_time_us = 30000  # set exposure to 30 ms
         self.camera.frames_per_trigger_zero_for_unlimited = 0  # start camera in continuous mode
@@ -151,6 +153,10 @@ class Camera(Handle):
         if frame is not None:
             self.data = numpy.copy(frame.image_buffer)
             self.data = numpy.clip(self.data,0,255).astype(numpy.uint8)
+            #print(self.data.shape)
+            if self.transpose:
+               self.data = self.data.T
+            #print(self.data.shape)
         return self.data
 
     def getNextImage(self):
@@ -180,9 +186,15 @@ class Camera(Handle):
         x_start = int(x_start)
         y_start = int(y_start)
         self.stopCapture()
+        #if self.transpose:
+        #    self.camera.roi = (x_start, y_start, int(x_start+height), int(y_start+width))
+        #else:
         self.camera.roi = (x_start, y_start, int(x_start+width), int(y_start+height))
         self.im_width = self.camera.image_width_pixels
         self.im_height = self.camera.image_height_pixels
+        if self.transpose:
+            self.im_width,self.im_height=self.im_height,self.im_width
+        print(self.im_width,self.im_height)
         self.setBuffers()
         self.startCapture()
 
@@ -231,8 +243,11 @@ class Camera(Handle):
         """
         Stop video capture.
         """
-        if self.camera.is_armed:
-            self.camera.disarm()
+        try:
+            if self.camera.is_armed:
+                self.camera.disarm()
+        except:
+            print("Camera Dead?")
 
 
 class CameraQPD(object):
@@ -317,7 +332,7 @@ class CameraQPD(object):
         """
         Get the next image from the camera.
         """
-        self.image = self.cam.captureImage()
+        self.image = self.cam.captureImage()#.T
         return self.image
 
     def changeFitMode(self, mode):

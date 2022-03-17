@@ -1,2 +1,1 @@
-rem Activate virtual environment and start Dave.
-c:\users\hazen\pyenv\hal2\scripts\activate && python dave.py
+cmd /k "C:\Users\Scope1\anaconda3\Scripts\activate myenv && python "C:\storm_control_megafish\storm_control\dave\dave.py"
