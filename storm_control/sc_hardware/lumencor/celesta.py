@@ -12,14 +12,9 @@ def lumencor_httpcommand(command = 'GET IP',ip = '192.168.201.200'):
     Plese find commands here:
     http://lumencor.com/wp-content/uploads/sites/11/2019/01/57-10018.pdf
     """
-    
     command_full = r'http://'+ip+'/service/?command='+command.replace(' ','%20')
-    message = {'message':'E'}
-    try:
-        with urllib.request.urlopen(command_full) as response:
-            message = eval(response.read()) # the default is conveniently JSON so eval creates dictionary
-    except:
-        pass
+    with urllib.request.urlopen(command_full) as response:
+        message = eval(response.read()) # the default is conveniently JSON so eval creates dictionary
     return message
 
 class LumencorLaser(object):
@@ -44,7 +39,7 @@ class LumencorLaser(object):
         except:
             print(traceback.format_exc())
             self.live = False
-            print("Failed to connect to Lumencor Laser at ip:", self.ip)
+            print("Failed to connect to Lumencor Laser at ip:", ip)
 
         if self.live:
             [self.pmin, self.pmax] = self.getPowerRange()
@@ -116,10 +111,8 @@ class LumencorLaser(object):
         """
         if on:
             lumencor_httpcommand(command = 'WAKEUP',ip=self.ip)
-            lumencor_httpcommand(command = 'SET TTLENABLE 1',ip=self.ip)
             self.message = lumencor_httpcommand(command = 'SET CH '+self.laser_id+' 1', ip=self.ip)
-            if self.message['message'][0]=='A':
-                self.on = True
+            self.on = True
         else:
             self.message = lumencor_httpcommand(command = 'SET CH '+self.laser_id+' 0', ip=self.ip)
             self.on = False
@@ -128,21 +121,13 @@ class LumencorLaser(object):
         """
         power_in_mw - The desired laser power in mW.
         """
-        if self.live:
-            print("Setting Power", power_in_mw, self.message)
-            if power_in_mw > self.pmax:
-                power_in_mw = self.pmax
-            #lumencor_httpcommand(command = 'WAKEUP',ip=self.ip)
-            #lumencor_httpcommand(command = 'SET CH '+self.laser_id+' 1', ip=self.ip)
-
-            if power_in_mw==0:
-                self.setLaserOnOff(False)
-            else:
-                self.setLaserOnOff(not self.on)
-                
-            self.message = lumencor_httpcommand(command ='SET CHINT '+self.laser_id+' '+ str(int(power_in_mw)), ip=self.ip)
-            if self.message['message'][0]=='A':
-                return True
+        print("Setting Power", power_in_mw, self.message)
+        if power_in_mw > self.pmax:
+            power_in_mw = self.pmax
+        lumencor_httpcommand(command = 'WAKEUP',ip=self.ip)
+        self.message = lumencor_httpcommand(command ='SET CHINT '+self.laser_id+' '+ str(int(power_in_mw)), ip=self.ip)
+        if self.message['message'][0]=='A':
+            return True
         return False
     def shutDown(self):
         """
@@ -151,7 +136,6 @@ class LumencorLaser(object):
         if self.live:
             self.setPower(0)
             self.setLaserOnOff(False)
-            self.live=False
     def getStatus(self):
         """
         Get the status

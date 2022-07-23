@@ -214,8 +214,9 @@ class TigerController(stageModule.StageModule):
                                                           update_interval = 500,
                                                           velocity = settings.get("velocity", 1.0),
                                                           z_stage = self.controller)
+                    
                     self.functionalities[self.module_name + "." + dev_name] = z_stage_fn
-
+                    self.z_stage_fn = z_stage_fn
                 elif (dev_name.startswith("led")):
                     settings = devices.get(dev_name)
                     led_fn = TigerLEDFunctionality(address = settings.get("address"),
@@ -234,9 +235,9 @@ class TigerController(stageModule.StageModule):
     
     def cleanUp(self, qt_settings):
         if self.controller is not None:
-            if self.z_piezo_functionality is not None:
-                self.z_piezo_functionality.goAbsolute(
-                    self.z_piezo_functionality.getMinimum())
+            #if self.z_piezo_functionality is not None:
+            #    self.z_piezo_functionality.goAbsolute(
+            #        self.z_piezo_functionality.getMinimum())
             
             for fn in self.functionalities.values():
                 if hasattr(fn, "wait"):

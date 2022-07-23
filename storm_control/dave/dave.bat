@@ -1,1 +1,1 @@
-cmd /k "C:\Users\Scope1\anaconda3\Scripts\activate myenv && python "C:\storm_control_megafish\storm_control\dave\dave.py"
+cmd /k "C:\Users\Scope2\anaconda3\Scripts\activate myenv && python "C:\Software\storm_control_megafish\storm_control\dave\dave.py"

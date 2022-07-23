@@ -17,7 +17,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from storm_control.fluidics.valves.qtValveControl import QtValveControl
 from storm_control.fluidics.valves.hamilton import HamiltonMVP
 from storm_control.fluidics.valves.idex import TitanValve
-
+from storm_control.fluidics.valves.illumina import ViciValve
 # ----------------------------------------------------------------------------------------
 # ValveChain Class Definition
 # ----------------------------------------------------------------------------------------
@@ -52,7 +52,9 @@ class ValveChain(QtWidgets.QWidget):
         elif valve_type == 'Titan':
             self.valve_chain = TitanValve(com_port = self.com_port,
                     verbose = self.verbose)
-
+        elif valve_type == 'Vici':
+            self.valve_chain = ViciValve(com_port = self.com_port,
+                    verbose = self.verbose)
         # Create QtValveControl widgets for each valve in the chain
         self.num_valves = self.valve_chain.howManyValves()
         self.valve_names = []

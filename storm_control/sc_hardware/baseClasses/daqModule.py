@@ -121,8 +121,8 @@ class DaqModule(hardwareModule.HardwareModule):
             # length with the same oversampling.
             if (self.oversampling == 0):
                 self.oversampling = waveform.getOversampling()
-                #self.waveform_len = waveform.getWaveformLength()
                 self.waveform_len = numpy.max(lengths)
+                #self.waveform_len = waveform.getWaveformLength()
             else:
                 assert (self.oversampling == waveform.getOversampling())
                 waveform_len_ = waveform.getWaveformLength()

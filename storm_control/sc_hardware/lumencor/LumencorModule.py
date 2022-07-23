@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 """
 HAL module for Lumencor laser control.
 
@@ -25,14 +25,18 @@ class LumencorLaserFunctionality(amplitudeModule.AmplitudeFunctionalityBuffered)
         # FIXME: We could build up a back-log here if the user
         #        gets carried away toggling the shutter button.
         self.mustRun(task = self.laser.setPower,
-                     args = [0.01 * power])
+                     args = [0.01 * power],
+                     ret_signal = None)
         self.on = state
+        
 
     def output(self, power):
         if self.on:
             self.maybeRun(task = self.laser.setPower,
                           args = [0.01 * power])
-
+                          
+    def startFilm(self, power):
+        self.onOff(power, True)
     
 class LumencorModule(amplitudeModule.AmplitudeModule):
     """

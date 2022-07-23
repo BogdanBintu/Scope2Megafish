@@ -705,8 +705,7 @@ if (__name__ == "__main__"):
 
     from PIL import Image
 
-    #loadDLL(r"C:\Program Files\Thorlabs\Scientific Imaging\ThorCam\uc480_64.dll")
-    loadDLL(r'C:\Program Files\Thorlabs\Scientific Imaging\ThorCam\thorlabs_tsi_camera_sdk.dll')
+    loadDLL("c:/windows/system32/uc480_64.dll")
 
     cam = Camera(1)
     reps = 1000

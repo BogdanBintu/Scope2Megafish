@@ -36,20 +36,14 @@ class LockControl(QtCore.QObject):
         self.check_focus_timer.timeout.connect(self.handleCheckFocusLock)
         
     def getLockModeName(self):
-        if self.lock_mode is not None:
-            return self.lock_mode.getName()
-        else:
-            return "None"
+        return self.lock_mode.getName()
+    
     def getLockTarget(self):
-        if self.lock_mode is not None:
-            return self.lock_mode.getLockTarget()
-        else:
-            return 0
+        return self.lock_mode.getLockTarget()
+
     def getQPDSumSignal(self):
-        if self.lock_mode is not None:
-            return self.lock_mode.getQPDState()["sum"]
-        else:
-            return 0
+        return self.lock_mode.getQPDState()["sum"]
+
     def handleCheckFocusLock(self):
         """
         This handles the 'Check Focus Lock' TCP message.
@@ -297,11 +291,7 @@ class LockControl(QtCore.QObject):
         This is whether or not the focus lock mode has a 'good' 
         lock, not just whether or not it is on.
         """
-        if self.lock_mode is not None:
-            return self.lock_mode.isGoodLock()
-        else:
-            self.working=False
-            return False
+        return self.lock_mode.isGoodLock()
         
     def setFunctionality(self, name, functionality):
         if (name == "qpd"):
@@ -313,8 +303,7 @@ class LockControl(QtCore.QObject):
     def setTimingFunctionality(self, functionality):
         if self.working:
             self.timing_functionality = functionality.getCameraFunctionality()
-            if self.timing_functionality is not None:
-                self.timing_functionality.newFrame.connect(self.handleNewFrame)
+            self.timing_functionality.newFrame.connect(self.handleNewFrame)
 
     def start(self):
         if (self.qpd_functionality is not None) and (self.z_stage_functionality is not None):
@@ -375,8 +364,8 @@ class LockControl(QtCore.QObject):
                 self.tiff_fp = None
                 
             self.lock_mode.stopFilm()
-        if self.timing_functionality is not None:
-            self.timing_functionality.newFrame.disconnect(self.handleNewFrame)
+
+        self.timing_functionality.newFrame.disconnect(self.handleNewFrame)
         self.timing_functionality = None
 
     def stopLock(self):

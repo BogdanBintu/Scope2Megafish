@@ -2,7 +2,7 @@
 """
 A ctypes based interface to the Photometrics PVCAM library.
 
-Hazen 10/17, Bogdan 4/20
+Hazen 10/17
 """
 import ctypes
 import numpy
@@ -120,6 +120,7 @@ class PVCAMCamera(object):
                                                  ctypes.byref(self.n_captured)),
               "pl_cam_register_callback_ex3")
         self.setParameter("param_readout_port", 2)### This is corresponding to the dynamic range mode - 16bit
+        
     def captureSetup(self, x_start, x_end, x_bin, y_start, y_end, y_bin, exposure_time):
         """
         Configure for image capture (circular buffer).
@@ -407,12 +408,16 @@ class PVCAMCamera(object):
         self.n_processed = 0
 
         # Start the acquisition.
+        #check(pvcam.pl_exp_start_cont(self.hcam,
+        #                              self.data_buffer.ctypes.data,
+        #                              pvc.uns32(self.data_buffer.size)),
+        #      "pl_exp_start_cont")
         check(pvcam.pl_exp_start_cont(self.hcam,
                                       #self.data_buffer.ctypes.data,
                                       pvc.ulong64(self.data_buffer.ctypes.data),  # This seems to work. Not having ulong64 gave errors: ctypes.ArgumentError: argument 2: <class 'OverflowError'>: int too long to convert
                                       pvc.uns32(self.data_buffer.size)),
               "pl_exp_start_cont")
-
+              
     def stopAcquisition(self):
         """
         Stop the current acquisition and tell the camera to go to the idle state.

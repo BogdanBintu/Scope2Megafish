@@ -139,6 +139,7 @@ class CTCTaskFunctionality(CTTaskFunctionality):
                                                         source = self.source,
                                                         frequency = self.frequency,
                                                         duty_cycle = duty_cycle)
+            
             if self.trigger_source is not None:
                 self.task.setTrigger(trigger_source = self.trigger_source,
                                      retriggerable = self.retriggerable)
@@ -255,7 +256,7 @@ class NidaqModule(daqModule.DaqModule):
 
     def __init__(self, module_params = None, qt_settings = None, **kwds):
         super().__init__(**kwds)
-
+        self.errorDAQ = False
         # These are the tasks that are used for waveform output.
         self.ao_task = None
         self.do_task = None
@@ -501,14 +502,21 @@ class NidaqModule(daqModule.DaqModule):
         Handle the 'stop film' message.
         """
         if self.run_shutters:
+            self.errorDAQ=False
             for task in [self.ct_task, self.ao_task, self.do_task]:
                 if task is not None:
                     try:
                         task.stopTask()
                         task.clearTask()
+                        errorDAQ_ = task.errorDAQ
+                        if errorDAQ_:
+                            self.errorDAQ=True
                     except nicontrol.NIException as e:
                         hdebug.logText("stop / clear failed for task " + str(task) + " with " + str(e))
-
+            #####BB patch to test DAQ error
+            fid = open("D:\Data\errorDAQ.txt",'w')
+            fid.write(str(self.errorDAQ))
+            fid.close()
             # Need to explicitly clear these so that PyDAQmx will release the resources.
             self.ao_task = None
             self.ct_task = None

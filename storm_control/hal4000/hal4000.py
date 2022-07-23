@@ -631,6 +631,7 @@ class HalCore(QtCore.QObject):
         # Notify the sender if errors occured while processing the
         # message and exit if the sender doesn't handle the error.
         if message.hasErrors():
+            sent_message = message##BBedit
             if not message.getSource().handleErrors(sent_message):
                 self.cleanUp()
                 return

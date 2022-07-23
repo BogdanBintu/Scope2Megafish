@@ -31,6 +31,7 @@ class Tiger(RS232.RS232):
         try:
             super().__init__(**kwds)
             assert not (self.commWithResp("WHO") == None)
+            self.joystickOnOff(True)#BB edit
 
         except (AttributeError, AssertionError):
             print(traceback.format_exc())
@@ -65,7 +66,7 @@ class Tiger(RS232.RS232):
             [self.x, self.y] = map(lambda x: float(x)*self.unit_to_um, 
                                    self.commWithResp("W X Y").split(" ")[1:3])
         except:
-            [self.x, self.y] = (0,0)
+            [self.x, self.y] = [0,0]#BBedit
         return {"x" : self.x,
                 "y" : self.y}
 
@@ -114,7 +115,8 @@ class Tiger(RS232.RS232):
         
     def zZero(self):
         self.commWithResp("H Z")
-        
+    def goZRelative(self, z):
+        self.commWithResp("R Z={0:.1f}".format(z * self.um_to_unit))
 
 if (__name__ == "__main__"):
     import time

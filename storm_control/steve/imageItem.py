@@ -38,7 +38,7 @@ class ImageItem(steveItems.SteveItem):
         super().__init__(**kwds)
 
         self.magnification = 1.0
-        self.numpy_data = numpy_data#[::4,::4]#######badBB
+        self.numpy_data = numpy_data
         self.objective_name = objective_name
         self.pixmap_max = 0
         self.pixmap_min = 0
