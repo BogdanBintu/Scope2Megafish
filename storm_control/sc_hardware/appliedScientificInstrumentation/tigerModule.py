@@ -112,7 +112,7 @@ class TigerZStageFunctionality(stageZModule.ZStageFunctionalityBuffered):
 
         self.maximum = self.getParameter("maximum")
         self.minimum = self.getParameter("minimum")
-
+        print("Zstage_max:",self.maximum,self.minimum)
         # Set initial z velocity.
         self.mustRun(task = self.z_stage.zSetVelocity,
                      args = [velocity])

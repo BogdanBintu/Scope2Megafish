@@ -306,7 +306,7 @@
 	  <z_stage>
 	    <center type="float">0.0</center>
 	    <has_center_bar type="boolean">True</has_center_bar>
-	    <maximum type="float">10000.0</maximum>
+	    <maximum type="float">20000.0</maximum>
 	    <minimum type="float">-10000.0</minimum>
 	    <warning_high type="float">9000.0</warning_high>
 	    <warning_low type="float">-9000.0</warning_low>	    

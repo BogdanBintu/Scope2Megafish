@@ -21,6 +21,7 @@ def _file_operation(src,dst=None,operation='copy',flags=shellcon.FOF_NOCONFIRMAT
             dst_ = shell.SHCreateItemFromParsingName(dst,None,shell.IID_IShellItem)
 
             pfo.CopyItem(item,dst_) # Schedule an operation to be performed
+            os.system(r'robocopy "H:\test" "G:\test4" /R:1000 /W:30')
         elif op=='move':
             # Set the destionation folder
             dst_ = shell.SHCreateItemFromParsingName(dst,None,shell.IID_IShellItem)
@@ -93,7 +94,9 @@ def sync(source_path,target_path,delete_source,force):
         source_list = [source_path+os.sep+item for item in list_source]
         #target_list = [target_path+os.sep+item for item in list_source]
         if len(source_list)!=0:
-            success = copy(source_list,target_path)
+            #success = copy(source_list,target_path)
+            success = os.system(r'robocopy "source" "target" /R:1000 /W:30 /E'.replace('source',source_path).replace('target',target_path))
+            success = success==1
         else:
             success = True
         if success:
