@@ -235,10 +235,12 @@ class Camera(Handle):
         """
         Start video capture (as opposed to single frame capture, which is done with self.captureImage().
         """
-        if not self.camera.is_armed and not self.disposed:
-            self.camera.arm(2)
-            self.camera.issue_software_trigger()
-
+        try:
+            if not self.camera.is_armed and not self.disposed:
+                self.camera.arm(2)
+                self.camera.issue_software_trigger()
+        except:
+            print("Camera is dead.")
     def stopCapture(self):
         """
         Stop video capture.

@@ -53,10 +53,6 @@ class Ui_MainWindow(object):
         self.actionLoad_Mosaic.setObjectName("actionLoad_Mosaic")
         self.actionDelete_Images = QtWidgets.QAction(MainWindow)
         self.actionDelete_Images.setObjectName("actionDelete_Images")
-        
-        self.actionMake_Mask = QtWidgets.QAction(MainWindow)
-        self.actionMake_Mask.setObjectName("actionMake_Mask")
-        
         self.actionLoad_Positions = QtWidgets.QAction(MainWindow)
         self.actionLoad_Positions.setObjectName("actionLoad_Positions")
         self.actionSave_Snapshot = QtWidgets.QAction(MainWindow)
@@ -70,7 +66,6 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionSet_Working_Directory)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionDelete_Images)
-        self.menuFile.addAction(self.actionMake_Mask)
         self.menuFile.addAction(self.actionLoad_Movies)
         self.menuFile.addAction(self.actionLoad_Mosaic)
         self.menuFile.addAction(self.actionLoad_Positions)
@@ -106,7 +101,6 @@ class Ui_MainWindow(object):
         self.actionLoad_Mosaic.setText(_translate("MainWindow", "Load &Mosaic"))
         self.actionLoad_Mosaic.setShortcut(_translate("MainWindow", "Ctrl+M"))
         self.actionDelete_Images.setText(_translate("MainWindow", "&Delete Images"))
-        self.actionMake_Mask.setText(_translate("MainWindow", "&Make Mask"))
         self.actionDelete_Images.setShortcut(_translate("MainWindow", "Ctrl+D"))
         self.actionLoad_Positions.setText(_translate("MainWindow", "Load &Positions"))
         self.actionLoad_Positions.setShortcut(_translate("MainWindow", "Ctrl+P"))

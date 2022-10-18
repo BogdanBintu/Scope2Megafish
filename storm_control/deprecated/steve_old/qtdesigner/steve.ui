@@ -124,13 +124,6 @@
     <string>Ctrl+D</string>
    </property>
   </action>
-  
-    <action name="actionMake_Mask">
-   <property name="text">
-    <string>&amp;Make Mask</string>
-   </property>
-  </action>
-  
   <action name="actionLoad_Positions">
    <property name="text">
     <string>Load &amp;Positions</string>
