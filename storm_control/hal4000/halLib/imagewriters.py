@@ -70,6 +70,24 @@ def createFileWriter(camera_functionality, film_settings):
         raise ImageWriterException("Unknown output file format '" + ft + "'")
 
 
+
+
+import ctypes
+import os
+import platform
+import sys
+import time
+def get_free_space_mb(dirname):
+    """Return folder/drive free space (in megabytes)."""
+    if platform.system() == 'Windows':
+        free_bytes = ctypes.c_ulonglong(0)
+        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(dirname), None, None, ctypes.pointer(free_bytes))
+        return free_bytes.value / 1024 / 1024
+    else:
+        st = os.statvfs(dirname)
+        return st.f_bavail * st.f_frsize / 1024 / 1024
+
+
 class BaseFileWriter(object):
 
     def __init__(self, camera_functionality = None, film_settings = None, **kwds):
@@ -87,6 +105,9 @@ class BaseFileWriter(object):
         if (len(self.cam_fn.getParameter("extension")) != 0):
             self.basename += "_" + self.cam_fn.getParameter("extension")
         self.filename = self.basename + self.film_settings.getFiletype()
+
+
+        
 
         # Connect the camera functionality.
         self.cam_fn.newFrame.connect(self.saveFrame)
@@ -109,12 +130,16 @@ class BaseFileWriter(object):
         return self.frame_size * self.number_frames
     
     def handleStopped(self):
+        dirname = os.path.dirname(self.filename)
+        while get_free_space_mb(dirname)<5000:
+            time.sleep(60)
         self.stopped = True
 
     def isStopped(self):
         return self.stopped
         
     def saveFrame(self):
+        
         self.number_frames += 1
 
 

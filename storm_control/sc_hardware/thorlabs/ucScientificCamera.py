@@ -146,17 +146,20 @@ class Camera(Handle):
         """
         Copy an image from the camera into self.data and return self.data
         """
-        self.startCapture()
-        frame=None
-        if self.camera.is_armed and not self.disposed:
-            frame = self.camera.get_pending_frame_or_null()
-        if frame is not None:
-            self.data = numpy.copy(frame.image_buffer)
-            self.data = numpy.clip(self.data,0,255).astype(numpy.uint8)
-            #print(self.data.shape)
-            if self.transpose:
-               self.data = self.data.T
-            #print(self.data.shape)
+        try:
+            self.startCapture()
+            frame=None
+            if self.camera.is_armed and not self.disposed:
+                frame = self.camera.get_pending_frame_or_null()
+            if frame is not None:
+                self.data = numpy.copy(frame.image_buffer)
+                self.data = numpy.clip(self.data,0,255).astype(numpy.uint8)
+                #print(self.data.shape)
+                if self.transpose:
+                   self.data = self.data.T
+                #print(self.data.shape)
+        except:
+            print("Failed to capture!")
         return self.data
 
     def getNextImage(self):

@@ -80,7 +80,7 @@ class SteveItemsStore(object):
         This will add the SteveItem to our data store and also to the
         QGraphicsScene if this is a graphical SteveItem.
         """
-        assert not (item.getItemID() in self.items)
+        #assert not (item.getItemID() in self.items)
         self.items[item.getItemID()] = item
         gi = item.getGraphicsItem()
         if gi is not None:

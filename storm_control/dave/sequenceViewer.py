@@ -163,6 +163,23 @@ class DaveCommandTreeViewer(QtWidgets.QTreeView):
             return [self.dv_model.getRemainingTime(), self.dv_model.getRunSize()]
         else:
             return [0, 0]
+    
+    ## getPreviousItem
+    #
+    #
+    # @return The previous DaveActionStandardItem or None if there are no more items.
+    #
+    def getPreviousItem(self,index=1):
+
+        if self.aborted:
+            self.aborted = False
+            return None
+
+        if self.dv_model is not None:
+            dave_action_si = self.dv_model.getPreviousItem(index)
+            if dave_action_si is not None:
+                self.viewportUpdate()
+                return dave_action_si
 
     ## getNextItem
     #
@@ -405,6 +422,20 @@ class DaveStandardItemModel(QtGui.QStandardItemModel):
     #
     def getCurrentItem(self):
         return self.dave_actions_cur[self.dave_action_index]
+
+    ## getPreviousItem
+    #
+    # @param index: int to skip back number of commands.
+    #
+    # @return The previous <index> DaveActionStandardItem or none if there are no more items.
+    #
+    def getPreviousItem(self,index=1):
+        self.dave_action_index -= index
+
+        if (self.dave_action_index <0):
+            return None
+        else:
+            return self.dave_actions_cur[self.dave_action_index]
 
     ## getNextItem
     #

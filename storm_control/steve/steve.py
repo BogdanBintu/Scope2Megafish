@@ -296,13 +296,16 @@ class Window(QtWidgets.QMainWindow):
         layers = [layer for layer in viewer.layers if 'base_mosaic' not in layer.name]
         im_msk = None
         if len(layers)>0:
+            im_msk = []
             layer = layers[-1]
-            if 'shape' in str(type(layer)):
-                im_msk = np.sum(layer.to_masks(),axis=0)>0
-            elif 'image' in str(type(layer)):
-                im_msk = layer.data>0
-            elif 'labels' in str(type(layer)):
-                im_msk = layer.data>0
+            for layer in layers:
+                if 'shape' in str(type(layer)):
+                    im_msk_ = np.sum(layer.to_masks(),axis=0)>0
+                    im_msk.append(im_msk_)
+            #elif 'image' in str(type(layer)):
+            #    im_msk = layer.data>0
+            #elif 'labels' in str(type(layer)):
+            #    im_msk = layer.data>0
                 
                 
         ##TSP
@@ -532,17 +535,24 @@ class Window(QtWidgets.QMainWindow):
             return np.round(x_keep,2),np.round(y_keep,2)
         if im_msk is not None:
             self.im_msk = im_msk
-            xkp,ykp = get_positions(im_msk,np.array([self.x_ums,self.y_ums]).T,
-                      low_mag_pixel_size=self.um_per_pixel,
-                      high_mag_pixel_size =self.target_um_per_pixel,
-                      drift=self.drift,
-                      fov_sz = self.fov_sz_low,
-                      perc_overlap=0.95,
-                      start_pos=[0,0],
-                      tag='circular')
-            import storm_control.steve.coord as coord
-            for x,y in zip(xkp,ykp):
-                self.positions.addPosition(coord.Point(float(x), float(y), "um"))
+            count_fl=0
+            for im_msk_ in im_msk:
+                count_fl+=1
+                xkp,ykp = get_positions(im_msk_,np.array([self.x_ums,self.y_ums]).T,
+                          low_mag_pixel_size=self.um_per_pixel,
+                          high_mag_pixel_size =self.target_um_per_pixel,
+                          drift=self.drift,
+                          fov_sz = self.fov_sz_low,
+                          perc_overlap=0.95,
+                          start_pos=[0,0],
+                          tag='circular')
+                fid = open(self.snapshot_directory+'pos_'+str(count_fl)+'.txt','w')
+                for x,y in zip(xkp,ykp):
+                    fid.write(str(x)+','+str(y)+'\n')
+                fid.close()
+                import storm_control.steve.coord as coord
+                for x,y in zip(xkp,ykp):
+                    self.positions.addPosition(coord.Point(float(x), float(y), "um"))
         else:
             print("Did not find mask!")
         

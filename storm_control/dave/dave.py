@@ -165,6 +165,7 @@ class Dave(QtWidgets.QMainWindow):
             fid.write('False')
             fid.close()
         # General.
+        self.counter_error=0
         self.directory = ""
         self.notifier = notifications.Notifier("", "", "", "")
         self.running = False
@@ -433,10 +434,19 @@ class Dave(QtWidgets.QMainWindow):
             print(str(currentDT))
         
         if errorStage:
-            next_command = self.ui.commandSequenceTreeView.getPreviousItem(index=2)
-            currentDT = datetime.datetime.now()
-            print(str(currentDT))
+            self.counter_error+=1
+            fid =  open(fl_Stage,'w')
+            fid.write('False')
+            fid.close()
+            if self.counter_error<4:
+                next_command = self.ui.commandSequenceTreeView.getPreviousItem(index=2)
+                currentDT = datetime.datetime.now()
+                print(str(currentDT))
+            else:
+                self.counter_error=0
+                next_command = self.ui.commandSequenceTreeView.getNextItem()
         if not errorDAQ and not errorStage:
+            self.counter_error=0
             next_command = self.ui.commandSequenceTreeView.getNextItem()
         
         

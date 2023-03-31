@@ -2,7 +2,6 @@
 """
 This class handles focus lock control, i.e. updating the
 position if the focus lock is locked, etc.
-
 Hazen 04/17
 """
 
@@ -82,7 +81,6 @@ class LockControl(QtCore.QObject):
     def handleDone(self, success):
         """
         Called by the lock mode when a behavior finishes.
-
         Note: self.current_state will only not be None if we are handling 
               a HAL TCP message.
         """
@@ -129,7 +127,6 @@ class LockControl(QtCore.QObject):
     def handleModeChanged(self, new_mode):
         """
         new_mode is a focusLock.LockMode object (listed in the mode combo box).
-
         Note: The only way to activate the 'locked' behavior is with the GUI.
               When you change lock modes the GUI will turn off the 'locked'
               behavior.
@@ -177,12 +174,6 @@ class LockControl(QtCore.QObject):
         Basically this is where all the action happens. The current
         mode tells us to move (or not) based on the current QPD signal, 
         then we poll the QPD again by calling the getOffset() method.
-
-        Note: Some QPDs are configured so that after the first call to 
-              getOffset() they will continuously emit the qpdUpdate() 
-              signal. We always call getOffset() again anyway, but if 
-              this was changed there is no guarantee that we'd stop
-              getting this signal from the QPD.
         """
         # Even if the current QPD reading is bad the mode needs to know, so
         # just pass the QPD reading through here.
@@ -195,11 +186,6 @@ class LockControl(QtCore.QObject):
         #
         # 2. If the QPD reading goes bad the mode will keep a stale value
         #    of the QPD state.
-        #
-        # FIXME: If we have a qpd_functionality and a z_stage_functionality but
-        #        are missing some other functionality then self.lock_mode could
-        #        be None. Not sure whether it is best to just fail here as we do
-        #        now or whether we should check for this.
         #
         self.lock_mode.handleQPDUpdate(qpd_dict)
 
@@ -215,6 +201,7 @@ class LockControl(QtCore.QObject):
         # Poll QPD again.
         self.qpd_functionality.getOffset()
 
+        
     def handleTCPMessage(self, message):
         """
         Handles TCP messages from tcpControl.TCPControl.
@@ -322,7 +309,8 @@ class LockControl(QtCore.QObject):
                     self.tiff_fp = tifffile.TiffWriter(film_settings.getBasename() + "_qpd.tif",
                                                        bigtiff = True)
 
-                self.offset_fp = open(film_settings.getBasename() + ".off", "w")
+                self.offset_file = film_settings.getBasename() + ".off"
+                self.offset_fp = open(self.offset_file, "w")
 
                 headers = ["frame", "offset", "power", "stage-z", "good-offset"]
                 if self.tiff_fp is not None:
@@ -357,7 +345,22 @@ class LockControl(QtCore.QObject):
             if self.offset_fp is not None:
                 self.offset_fp.close()
                 self.offset_fp = None
-                
+                ### test if stage failed BBEdit
+                lines = [ln for ln in open(self.offset_file, "r") if len(ln)>1]
+                last_stage = float(lines[-1].split(' ')[-2])
+                if last_stage<20:
+                    ###stage failed flag as error for dave to repeat the imaging
+                    print("BadStage")
+                    fl_Stage = r'D:\Data\errorStage.txt'
+                    fid = open(fl_Stage,'w')
+                    fid.write('True')
+                    fid.close()
+                else:
+                    print("GoodStage")
+                    fl_Stage = r'D:\Data\errorStage.txt'
+                    fid = open(fl_Stage,'w')
+                    fid.write('False')
+                    fid.close()
             if self.tiff_fp is not None:
                 self.tiff_counter = None
                 self.tiff_fp.close()
